@@ -1,0 +1,22 @@
+---
+title: "Pronósticos de indicadores básicos de construcción y vivienda"
+author: "CANADEVI Nacional"
+date: "3 de agosto de 2020"
+output: 
+  ioslides_presentation: 
+    logo: canadevi.jpg
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Presentación
+
+- El presente trabajo es un ejercicio de prospectiva realizado desde <b>CANADEVI Nacional</b> para ofrecer información oportuna que permita conocer las tendencias de los indicadores básicos del sector de la construcción y, en particular, el de la vivienda para la toma de decisiones.
+
+- Conforme se vayan dando a conocer los datos observados por parte de las fuentes oficiales y aquellas que sirvan como insumo para los cálculos, las estimaciones de este documento se irán actualizando.
+
+
+## Producto interno bruto del sector de la construcción
