@@ -1,0 +1,12 @@
+name: forecast
+title: forecast
+username:
+account: claudiodanielpc
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2638713
+bundleId: 3471207
+url: https://claudiodanielpc.shinyapps.io/forecast/
+when: 1596496597.17235
+asMultiple: FALSE
+asStatic: FALSE
