@@ -1,0 +1,4 @@
+﻿"Leyendas."
+"P","Preliminar"
+"R","Revisada"
+"No Aplica.","NA"

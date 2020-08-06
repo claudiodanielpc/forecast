@@ -1,0 +1,30 @@
+﻿
+Identifier:   DCAT-MEX-INEGI-SCNM.IMAI-AB2013-011
+
+Title:   Sistema de Cuentas Nacionales de México. Indicador Mensual de la Actividad Industrial
+
+Description:   INEGI. Sistema de Cuentas Nacionales de México. Indicador Mensual de la Actividad Industrial. SNIEG. Información de Interés Nacional.
+
+Proporciona también información estadística que permite un conocimiento amplio y oportuno sobre el comportamiento del sector industrial, midiendo la evolución mensual de la actividad productiva.
+
+Modified:   2020-07-09
+
+Publisher:   Instituto Nacional de Estadística y Geografía, INEGI
+
+Mbox:   atencion.usuarios@inegi.org.mx
+
+License:   https://www.inegi.org.mx/inegi/terminos.html
+
+DataDictionary:   
+
+Keyword:   "Actividad industrial", "Sector industrial", "Sectores económicos", "Industria Manufacturera", "Evolución", "industrial", "Indicador", "corto plazo", "Sector secundario", "Construcción", "Electricidad", "Minería"
+
+ContactPoint:   Lic. José de Jesús Esquivel de la Rosa, 800 111 4634
+
+Temporal:   1993-01-2020-05
+
+Spatial:   Estados Unidos Mexicanos
+
+AccrualPeriodicity:   Mensualmente
+
+Distribution:   https://www.inegi.org.mx/programas/imai/2013/

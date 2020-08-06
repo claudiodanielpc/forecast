@@ -1,0 +1,3 @@
+﻿"Leyendas."
+"P","Preliminar"
+"R","Revisada"
