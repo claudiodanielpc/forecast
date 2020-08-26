@@ -1,5 +1,5 @@
 ---
-title: "Pronósticos de indicadores clave de construcción y vivienda"
+title: "Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda"
 author: "Claudio Daniel Pacheco Castro"
 date: "3/8/2020"
 pagetitle: "Prospectiva CANADEVI"
@@ -11,6 +11,10 @@ output:
     number_sections: true
 runtime: shiny
 ---
+<style>
+body {
+text-align: justify}
+</style>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -26,6 +30,8 @@ Para tener más información sobre la coyuntura del sector, consulta nuestro <b>
 
 # Datos
 ## Producto Interno Bruto de la Construcción
+
+La estimación de crecimiento del Producto Interno Bruto de la Construcción toma como referencia los datos observados por INEGI tanto de la economía en su conjunto como del sector construcción. Para pronosticar los valores a futuro, se utilizan las estimaciones publicadas en la <b>[Encuesta sobre las expectativas de los especialistas en economía del sector privado](https://www.banxico.org.mx/publicaciones-y-prensa/encuestas-sobre-las-expectativas-de-los-especialis/encuestas-expectativas-del-se.html)</b> publicada de manera mensual por el Banco de México.
 
 ```{r echo=FALSE, message=FALSE}
 library(tidyverse)
@@ -95,6 +101,7 @@ library(highcharter)
 
 #hchart(fcast) %>% hc_add_theme(hc_theme_sandsignika())
      highchart()%>%
+       hc_size(700,500)%>%
             ##Tipo de gráfico
            ##Título
             hc_title(text = "<b>Producto Interno Bruto de la Construcción</b>",
@@ -118,6 +125,10 @@ library(highcharter)
                      type="column",
                      pointWidth=4,
                       marker = list(symbol = 'circle') )%>%
+    hc_tooltip(pointFormat = '
+                            
+
+                            {point.y:.1f}% ')%>%
      
      hc_xAxis(categories =  unique(datos$trim)) %>%
             hc_yAxis( title = list(text = "Var. % anual"))%>%
@@ -133,11 +144,91 @@ library(highcharter)
 
 ## Trabajadores de la construcción asegurados ante el IMSS 
 
-```{r}
+Para el caso de la estimación del crecimiento de los trabajadores asegurados en la construcción, se toma como referencia la estimación del PIB de la construcción así como la estacionalidad de la serie del empleo. Es importante señalar que para poder realizar la estimación con el PIB, se utilizaron los registros de trabajadores al cierre del trimestre.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(forecast)
+library(scales)
+library(lubridate)
+library(ggfortify)
+
+##Se importan los datos
+##URL del archivo
+trab<-read.csv("https://raw.githubusercontent.com/claudiodanielpc/forecast/master/pruebatrim.csv",
+               encoding="latin",header=TRUE,check.names=FALSE)
+
+
+trab<-trab%>%
+##Se transforma a serie de tiempo
+ts(.,start=c(1999,1),frequency=4)
+
+modelo<-auto.arima(trab[,"trab"],
+                   xreg=trab[,"pib"])
+
+##Se traen los datos estimados del PIB de la construcción
+datos<-datos%>%
+  ##Dejar solo los estimados
+  filter(tipo=="Estimado")%>%
+  ##Solo construcción
+  filter(!is.na(const))%>%
+  select(const)%>%
+  rename(pib=const)%>%
+  #Eliminar primera observación
+  slice(-1)%>%
+  #Declarar serie de tiempo
+  ts(.,start=c(2020,3),frequency=4)
+
+##Estimar valores futuros
+  fcast<-forecast(modelo,xreg=datos[,"pib"])
+
+##Se crea la base de datos
+df<-fortify(fcast)%>%
+  mutate(trim=seq(ymd("1999/1/1"), ymd("2020/12/30"), by = "quarter"))%>%
+  mutate(trim=quarter(trim,with_year=T))
+
+##Crear highchart
+library(highcharter)
+
+highchart() %>% 
+  hc_size(700,500)%>%
+  ##Título
+            hc_title(text = "<b>Trabajadores de la construcción asegurados ante el IMSS</b>",
+                     margin = 20, align = "left",
+                     style = list(color = "black", useHTML = TRUE))%>%
+       ##Subtítulo
+            hc_subtitle(text = "<i>1999-2020</i>
+                        <br><i>Variación % anual</i>",
+                        align = "left",
+                        style = list(color = "black", fontWeight = "bold")) %>%
+  hc_add_series(df, "line", hcaes(trim, Data), name = "Observado",
+                color='#bdbdbd') %>% 
+  #hc_add_series(df, "line", hcaes(Index, Fitted), name = "Estimado",
+   #             dashStyle = "shortdash",color='#feb24c') %>%
+  hc_add_series(df, "line", hcaes(trim, `Point Forecast`), name = "Estimado",
+                color='#feb24c',dashStyle = "shortdash") %>% 
+  #hc_add_series(df, "arearange", hcaes(trim, low = `Lo 80`, high = `Hi 80`), name = "Intervalo", color="#e5f5e0")%>%
+    hc_tooltip(pointFormat = '
+                            {point.y:.1f}% ')%>%
+       hc_yAxis( title = list(text = "Var. % anual"))%>%
+  hc_xAxis(categories =  unique(df$trim))%>%   
+    hc_credits(
+    enabled = TRUE, text = "Fuente: Elaborado por CANADEVI Nacional. 
+    Gerencia de Fondos de Vivienda. 
+    Coordinación de Indicadores de Vivienda con información del IMSS e INEGI.",
+    style = list(fontSize = "8px")
+  )
+
+
+
+
 
 ```
 
 ## Producción de vivienda
+
+En el caso de la producción de vivienda, se utiliza un modelo sencillo de media móvil tomando en consideración la estacionalidad de la serie.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -164,7 +255,7 @@ ts(.,start=c(2013,1),frequency=12)
 
 modruv<-auto.arima(ruv[,"prod"])
 
-ruvest<-forecast(modruv,6)
+ruvest<-forecast(modruv,5)
 
 ##Transformar a dataframe
 library(ggfortify)
@@ -175,12 +266,14 @@ df<-fortify(ruvest)
 library(highcharter)
 
 highchart(type = "stock") %>% 
+  hc_size(700,500)%>%
   ##Título
             hc_title(text = "<b>Producción de vivienda</b>",
                      margin = 20, align = "left",
                      style = list(color = "black", useHTML = TRUE))%>%
        ##Subtítulo
-            hc_subtitle(text = "<i>2013-2020</i>",
+            hc_subtitle(text = "<i>2013-2020</i>
+                        <br><i>Número de viviendas</i>",
                         align = "left",
                         style = list(color = "black", fontWeight = "bold")) %>%
   hc_add_series(df, "line", hcaes(Index, Data), name = "Observado",
@@ -190,6 +283,11 @@ highchart(type = "stock") %>%
   hc_add_series(df, "line", hcaes(Index, `Point Forecast`), name = "Estimado",
                 color='#feb24c',dashStyle = "shortdash") %>% 
   #hc_add_series(df, "arearange", hcaes(Index, low = `Lo 80`, high = `Hi 80`), name = "Intervalo", color="#e5f5e0")%>%
+  
+    hc_tooltip(pointFormat = '{point.x: %Y-%b}
+                          
+
+                            {point.y:,.0f}')%>%
        hc_yAxis( title = list(text = "Viviendas"))%>%
        hc_credits(
     enabled = TRUE, text = "Fuente: Elaborado por CANADEVI Nacional. 

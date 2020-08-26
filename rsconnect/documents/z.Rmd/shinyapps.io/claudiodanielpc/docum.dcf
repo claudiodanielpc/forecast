@@ -5,8 +5,8 @@ account: claudiodanielpc
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2638958
-bundleId: 3497788
+bundleId: 3559020
 url: https://claudiodanielpc.shinyapps.io/docum/
-when: 1597075244.84669
+when: 1598428380.82036
 asMultiple: FALSE
 asStatic: FALSE
