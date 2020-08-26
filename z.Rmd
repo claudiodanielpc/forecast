@@ -2,6 +2,7 @@
 title: "Pronósticos de indicadores clave de construcción y vivienda"
 author: "Claudio Daniel Pacheco Castro"
 date: "3/8/2020"
+pagetitle: "Prospectiva CANADEVI"
 output: 
   html_document:
     toc: true
@@ -130,6 +131,11 @@ library(highcharter)
      
 ```
 
+## Trabajadores de la construcción asegurados ante el IMSS 
+
+```{r}
+
+```
 
 ## Producción de vivienda
 
