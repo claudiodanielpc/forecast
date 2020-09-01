@@ -1,0 +1,12 @@
+name: prospectivacanadevi
+title: prospectivacanadevi
+username:
+account: canadevi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2709640
+bundleId: 3559678
+url: https://canadevi.shinyapps.io/prospectivacanadevi/
+when: 1598443300.40934
+asMultiple: FALSE
+asStatic: FALSE

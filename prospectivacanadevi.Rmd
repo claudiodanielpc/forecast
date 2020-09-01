@@ -1,7 +1,7 @@
 ---
-title: "Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda"
-author: "Claudio Daniel Pacheco Castro"
-date: "3/8/2020"
+title: "<b>Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda</b>"
+author: "CANADEVI Nacional<br>Gerencia de Fondos de Vivienda<br>Coordinación de Indicadores de Vivienda"
+date: "1° de septiembre de 2020"
 pagetitle: "Prospectiva CANADEVI"
 output: 
   html_document:
@@ -20,7 +20,7 @@ text-align: justify}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 # Introducción
-El presente trabajo es un ejercicio de prospectiva realizado desde <b>[CANADEVI NACIONAL](https://www.canadevi.com.mx)</b> para ofrecer información oportuna que permita conocer las tendencias de los indicadores más relevantes del sector de la construcción y, en particular, el de la vivienda para la toma de decisiones.
+El presente trabajo es un ejercicio de prospectiva realizado desde <b>[CANADEVI NACIONAL](https://www.canadevi.com.mx)</b> para ofrecer <b>estimaciones oportunas</b> de los indicadores clave de la construcción y, en particular de la vivienda. Lo anterior, con la finalidad de poder pronosticar el rumbo de éstas en el corto plazo y tener mayores elementos para la toma de decisiones.
 
 Conforme se vayan dando a conocer los datos observados por parte de las fuentes oficiales y aquellas que sirvan como insumo para los cálculos, las estimaciones de este documento se irán actualizando.
 
@@ -49,16 +49,16 @@ pib<-read.csv("https://raw.githubusercontent.com/claudiodanielpc/forecast/master
 ##Se crea el dataset para el modelo
 pibmod<-pib%>%
   ###Se dejan los datos observados
-  filter(trim<="2020.1")%>%
+  filter(trim<="2020.2")%>%
   ##Se transforma a serie de tiempo
   ts(.,start=c(1994,1),frequency=4)
 
 ##Se establecen el vector de regresores
 xreg<-pib%>%
   ##Se dejan los datos que permitirán estimar hacia adelante
-  filter(trim>"2020.1")%>%
+  filter(trim>"2020.2")%>%
   ##Se transforma a serie de tiempo
-  ts(.,start=c(2020,2),frequency=4)
+  ts(.,start=c(2020,3),frequency=4)
 
 
 
@@ -73,7 +73,7 @@ fcast<-forecast(modelo,xreg=xreg[,"pib"])%>%
   as.data.frame()%>%
   rename(const=1)%>%
   select(const)%>%
-  mutate(trim=seq(ymd("2020/4/1"), ymd("2020/12/30"), by = "quarter"))%>%
+  mutate(trim=seq(ymd("2020/7/1"), ymd("2020/12/30"), by = "quarter"))%>%
   mutate(trim=quarter(trim,with_year=T))
 
 
@@ -81,7 +81,7 @@ fcast<-forecast(modelo,xreg=xreg[,"pib"])%>%
 estima<-pibmod%>%
   as.data.frame()%>%
   select(const,trim)%>%
-  mutate(const = replace(const, trim<="2020.1", NA))
+  mutate(const = replace(const, trim<="2020.2", NA))
   
 estima<-rbind(estima,fcast)
 estima<-estima%>%
@@ -176,7 +176,7 @@ datos<-datos%>%
   select(const)%>%
   rename(pib=const)%>%
   #Eliminar primera observación
-  slice(-1)%>%
+  #slice(-1)%>%
   #Declarar serie de tiempo
   ts(.,start=c(2020,3),frequency=4)
 
