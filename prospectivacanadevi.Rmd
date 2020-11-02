@@ -1,7 +1,7 @@
 ---
 title: "<b>Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda</b>"
 author: "CANADEVI Nacional<br>Gerencia de Fondos de Vivienda<br>Coordinación de Indicadores de Vivienda"
-date: "Fecha de actualización: 1 de octubre de 2020"
+date: "Fecha de actualización: 30 de octubre de 2020"
 pagetitle: "Prospectiva CANADEVI"
 output: 
   html_document:
