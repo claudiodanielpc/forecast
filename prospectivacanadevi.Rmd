@@ -1,7 +1,7 @@
 ---
 title: "<b>Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda</b>"
 author: "CANADEVI Nacional<br>Gerencia de Fondos de Vivienda<br>Coordinación de Indicadores de Vivienda"
-date: "Fecha de actualización: 30 de octubre de 2020"
+date: "Fecha de actualización: 4 de noviembre de 2020"
 pagetitle: "Prospectiva CANADEVI"
 output: 
   html_document:
@@ -170,15 +170,15 @@ modelo<-auto.arima(trab[,"trab"],
 ##Se traen los datos estimados del PIB de la construcción
 datos<-datos%>%
   ##Dejar solo los estimados
-  filter(tipo=="Estimado")%>%
+  dplyr::filter(tipo=="Estimado")%>%
   ##Solo construcción
-  filter(!is.na(const))%>%
+  dplyr::filter(!is.na(const))%>%
   select(const)%>%
   rename(pib=const)%>%
   #Eliminar primera observación
-  #slice(-1)%>%
+  slice(-1)%>%
   #Declarar serie de tiempo
-  ts(.,start=c(2020,3),frequency=4)
+  ts(.,start=c(2020,4),frequency=4)
 
 ##Estimar valores futuros
   fcast<-forecast(modelo,xreg=datos[,"pib"])
