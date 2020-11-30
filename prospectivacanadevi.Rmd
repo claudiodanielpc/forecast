@@ -1,7 +1,7 @@
 ---
 title: "<b>Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda</b>"
 author: "CANADEVI Nacional<br>Gerencia de Fondos de Vivienda<br>Coordinación de Indicadores de Vivienda"
-date: "Fecha de actualización: 4 de noviembre de 2020"
+date: "Fecha de actualización: 30 de noviembre de 2020"
 pagetitle: "Prospectiva CANADEVI"
 output: 
   html_document:
@@ -49,16 +49,16 @@ pib<-read.csv("https://raw.githubusercontent.com/claudiodanielpc/forecast/master
 ##Se crea el dataset para el modelo
 pibmod<-pib%>%
   ###Se dejan los datos observados
-  filter(trim<="2020.2")%>%
+  filter(trim<="2020.3")%>%
   ##Se transforma a serie de tiempo
   ts(.,start=c(1994,1),frequency=4)
 
 ##Se establecen el vector de regresores
 xreg<-pib%>%
   ##Se dejan los datos que permitirán estimar hacia adelante
-  filter(trim>"2020.2")%>%
+  filter(trim>"2020.3")%>%
   ##Se transforma a serie de tiempo
-  ts(.,start=c(2020,3),frequency=4)
+  ts(.,start=c(2020,4),frequency=4)
 
 
 
@@ -81,7 +81,7 @@ fcast<-forecast(modelo,xreg=xreg[,"pib"])%>%
 estima<-pibmod%>%
   as.data.frame()%>%
   select(const,trim)%>%
-  mutate(const = replace(const, trim<="2020.2", NA))
+  mutate(const = replace(const, trim<="2020.3", NA))
   
 estima<-rbind(estima,fcast)
 estima<-estima%>%
@@ -255,7 +255,7 @@ ts(.,start=c(2013,1),frequency=12)
 
 modruv<-auto.arima(ruv[,"prod"])
 
-ruvest<-forecast(modruv,3)
+ruvest<-forecast(modruv,2)
 
 ##Transformar a dataframe
 library(ggfortify)
