@@ -73,19 +73,15 @@ fcast<-forecast(modelo,xreg=xreg[,"pib"])%>%
   as.data.frame()%>%
   rename(const=1)%>%
   select(const)%>%
-  mutate(trim=seq(ymd("2020/7/1"), ymd("2020/12/30"), by = "quarter"))%>%
+  mutate(trim=seq(ymd("2020/10/1"), ymd("2020/12/30"), by = "quarter"))%>%
   mutate(trim=quarter(trim,with_year=T))
 
 
+estima<-fcast%>%
+  mutate(tipo="Estimado")  
 
-estima<-pibmod%>%
-  as.data.frame()%>%
-  select(const,trim)%>%
-  mutate(const = replace(const, trim<="2020.3", NA))
-  
-estima<-rbind(estima,fcast)
-estima<-estima%>%
-  mutate(tipo="Estimado")
+#estima<-rbind(estima,fcast)
+
 
 ##Crear la dataframe para graficarlo
 
@@ -94,7 +90,10 @@ datos<-pibmod%>%
   select(const,trim)%>%
   mutate(tipo="Observado")
 
-datos<-rbind(datos,estima)
+datos<-rbind(datos,estima)%>%
+  mutate(trim=seq(ymd("1994/1/1"), ymd("2020/12/30"), by = "quarter"))%>%
+  mutate(trim=quarter(trim,with_year=T))
+
 
 ##Gráfica dinámica
 library(highcharter)
@@ -176,7 +175,7 @@ datos<-datos%>%
   select(const)%>%
   rename(pib=const)%>%
   #Eliminar primera observación
-  slice(-1)%>%
+  #slice(-1)%>%
   #Declarar serie de tiempo
   ts(.,start=c(2020,4),frequency=4)
 
@@ -255,7 +254,7 @@ ts(.,start=c(2013,1),frequency=12)
 
 modruv<-auto.arima(ruv[,"prod"])
 
-ruvest<-forecast(modruv,2)
+ruvest<-forecast(modruv,13)
 
 ##Transformar a dataframe
 library(ggfortify)
