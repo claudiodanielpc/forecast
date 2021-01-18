@@ -5,8 +5,8 @@ account: canadevi
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2709640
-bundleId: 3925176
+bundleId: 4109788
 url: https://canadevi.shinyapps.io/prospectivacanadevi/
-when: 1606780455.8532
+when: 1610927189.87612
 asMultiple: FALSE
 asStatic: FALSE
