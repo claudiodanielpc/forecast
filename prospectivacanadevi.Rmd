@@ -106,7 +106,7 @@ f1<-ggplot(datos, aes(trim, const, fill = tipo)) +
   theme_minimal()+
   theme(legend.title = element_blank(),
         axis.text.x = element_text(angle = 90, vjust = 0.5))+
-  scale_x_continuous("Trimestre",breaks=seq(1994,2020,by=2))
+  scale_x_continuous("Trimestre",breaks=seq(1994,2021,by=2))
   #labs(title = "Producto Interno Bruto de la Construcción",
    # subtitle = "Variación % anual",
     #y = "Trimestre",
@@ -234,7 +234,7 @@ datos<-datos%>%
 
 ##Se crea la base de datos
 df<-fortify(fcast)%>%
-  mutate(trim=seq(ymd("1999/1/1"), ymd("2020/12/30"), by = "quarter"))%>%
+  mutate(trim=seq(ymd("1999/1/1"), ymd("2021/12/30"), by = "quarter"))%>%
   mutate(trim=quarter(trim,with_year=T))
 
 ##Crear highchart
