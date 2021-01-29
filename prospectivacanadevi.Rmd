@@ -1,7 +1,7 @@
 ---
 title: "<b>Prospectiva CANADEVI <br>Indicadores clave de construcción y vivienda</b>"
 author: "CANADEVI Nacional<br>Gerencia de Fondos de Vivienda<br>Coordinación de Indicadores de Vivienda"
-date: "Fecha de actualización: 30 de noviembre de 2020"
+date: "Fecha de actualización: 18 de enero de 2021"
 pagetitle: "Prospectiva CANADEVI"
 output: 
   html_document:
@@ -39,6 +39,7 @@ library(tidyverse)
 library(forecast)
 library(scales)
 library(lubridate)
+library(zoo)
 
 
 ##Datos
@@ -98,15 +99,19 @@ datos<-rbind(datos,estima)%>%
   mutate(trim=quarter(trim,with_year=T))%>%
   arrange(trim)
 
+datos1<-datos%>%
+  filter(trim>=2000.1)
+
+
 library(plotly)
 
-f1<-ggplot(datos, aes(trim, const, fill = tipo)) +
+f1<-ggplot(datos1, aes(trim, const, fill = tipo)) +
     geom_col(width=0.1)+
   scale_fill_manual(values=c("#E69F00","#999999"))+
   theme_minimal()+
   theme(legend.title = element_blank(),
         axis.text.x = element_text(angle = 90, vjust = 0.5))+
-  scale_x_continuous("Trimestre",breaks=seq(1994,2021,by=2))
+  scale_x_continuous("Trimestre",breaks=seq(2000,2021,by=2))
   #labs(title = "Producto Interno Bruto de la Construcción",
    # subtitle = "Variación % anual",
     #y = "Trimestre",
@@ -129,7 +134,7 @@ ggplotly(f1,width = 900, height = 500)%>%
 #plot_ly(datos, x = ~trim, y = ~const, type = 'bar', 
  #       split = ~tipo, color=~tipo,colors = c("#feb24c", "#bdbdbd"),
   #      width = 800, height = 500)%>% 
-  layout(title=list(text="<b>Producto Interno Bruto de la Construcción</b>", 
+  layout(title=list(text="<b>Producto Interno Bruto de la Construcción</b><br><i>2000-2021</i><br><i>Variación % anual</i>", 
          x = 0,
          font=list(family = "Century Gothic",
         size = 16,
@@ -225,9 +230,9 @@ datos<-datos%>%
   select(const)%>%
   rename(pib=const)%>%
   #Eliminar primera observación
-  #slice(-1)%>%
+  slice(-1)%>%
   #Declarar serie de tiempo
-  ts(.,start=c(2020,4),frequency=4)
+  ts(.,start=c(2021,1),frequency=4)
 
 ##Estimar valores futuros
   fcast<-forecast(modelo,xreg=datos[,"pib"])
@@ -235,43 +240,73 @@ datos<-datos%>%
 ##Se crea la base de datos
 df<-fortify(fcast)%>%
   mutate(trim=seq(ymd("1999/1/1"), ymd("2021/12/30"), by = "quarter"))%>%
-  mutate(trim=quarter(trim,with_year=T))
+  mutate(trim=quarter(trim,with_year=T))%>%
+  select(Index,Data,`Point Forecast`)%>%
+  mutate(tipo=ifelse(is.na(Data),"Estimado","Observado"))%>%
+  mutate(Data=ifelse(is.na(Data),`Point Forecast`,Data))%>%
+  select(Index, Data,tipo)%>%
+  mutate(Index=as.yearqtr(Index,format="%Y-%m-%d"))
+
+##Gráfica de ggplot
+f2<-ggplot(df, aes(x=Index, Data)) + 
+  geom_line(aes(color = tipo),size=1)+
+  geom_point(aes(color=tipo),size=2)+
+  #scale_linetype_manual(values=c("twodash","solid"))+
+  scale_color_manual(values = c("#feb24c", "#bdbdbd"))+
+  theme_minimal()+
+theme(legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5))
+#Plotly
+
+ggplotly(f2,width = 900, height = 500)%>%
+  layout(title=list(text="<b>Trabajadores de la construcción asegurados ante el IMSS</b><br><i>1999-2021</i><br><i>Variación % anual</i>", 
+         x = 0,
+         font=list(family = "Century Gothic",
+        size = 16,
+        color = 'black')),
+         xaxis = list(title = ""),
+         yaxis = list(title = "Var. % anual",
+                      tickformat=".1f%"),
+        dragmode="pan",
+         annotations =
+ list(x = 0, y = 0, text = "Fuente: Elaborado por CANADEVI Nacional. Gerencia de Fondos de Vivienda. Coordinación de Indicadores de Vivienda con información del IMSS e INEGI.", 
+      showarrow = F, xref='paper', yref='paper', 
+      xanchor='left', yanchor='auto', xshift=0, yshift=0,
+     font=list(size=8, color="black")))
+
+
 
 ##Crear highchart
-library(highcharter)
+#library(highcharter)
 
-highchart() %>% 
-  hc_size(700,500)%>%
+#highchart() %>% 
+ # hc_size(700,500)%>%
   ##Título
-            hc_title(text = "<b>Trabajadores de la construcción asegurados ante el IMSS</b>",
-                     margin = 20, align = "left",
-                     style = list(color = "black", useHTML = TRUE))%>%
+  #          hc_title(text = "<b>Trabajadores de la construcción asegurados ante el IMSS</b>",
+ #                    margin = 20, align = "left",
+  #                   style = list(color = "black", useHTML = TRUE))%>%
        ##Subtítulo
-            hc_subtitle(text = "<i>1999-2020</i>
-                        <br><i>Variación % anual</i>",
-                        align = "left",
-                        style = list(color = "black", fontWeight = "bold")) %>%
-  hc_add_series(df, "line", hcaes(trim, Data), name = "Observado",
-                color='#bdbdbd') %>% 
+   #         hc_subtitle(text = "<i>1999-2020</i>
+    #                    <br><i>Variación % anual</i>",
+     #                   align = "left",
+      #                  style = list(color = "black", fontWeight = "bold")) %>%
+  #hc_add_series(df, "line", hcaes(trim, Data), name = "Observado",
+   #             color='#bdbdbd') %>% 
   #hc_add_series(df, "line", hcaes(Index, Fitted), name = "Estimado",
    #             dashStyle = "shortdash",color='#feb24c') %>%
-  hc_add_series(df, "line", hcaes(trim, `Point Forecast`), name = "Estimado",
-                color='#feb24c',dashStyle = "shortdash") %>% 
+  #hc_add_series(df, "line", hcaes(trim, `Point Forecast`), name = "Estimado",
+ #               color='#feb24c',dashStyle = "shortdash") %>% 
   #hc_add_series(df, "arearange", hcaes(trim, low = `Lo 80`, high = `Hi 80`), name = "Intervalo", color="#e5f5e0")%>%
-    hc_tooltip(pointFormat = '
-                            {point.y:.1f}% ')%>%
-       hc_yAxis( title = list(text = "Var. % anual"))%>%
-  hc_xAxis(categories =  unique(df$trim))%>%   
-    hc_credits(
-    enabled = TRUE, text = "Fuente: Elaborado por CANADEVI Nacional. 
-    Gerencia de Fondos de Vivienda. 
-    Coordinación de Indicadores de Vivienda con información del IMSS e INEGI.",
-    style = list(fontSize = "8px")
-  )
-
-
-
-
+  #  hc_tooltip(pointFormat = '
+   #                         {point.y:.1f}% ')%>%
+    #   hc_yAxis( title = list(text = "Var. % anual"))%>%
+  #hc_xAxis(categories =  unique(df$trim))%>%   
+   # hc_credits(
+    #enabled = TRUE, text = "Fuente: Elaborado por CANADEVI Nacional. 
+  #  Gerencia de Fondos de Vivienda. 
+   # Coordinación de Indicadores de Vivienda con información del IMSS e INEGI.",
+  #  style = list(fontSize = "8px")
+  #)
 
 ```
 
@@ -284,7 +319,7 @@ library(tidyverse)
 library(forecast)
 library(scales)
 library(lubridate)
-
+library(zoo)
 
 ##Se importa la base de datos de RUV
 ##URL del archivo
@@ -308,42 +343,82 @@ ruvest<-forecast(modruv,13)
 
 ##Transformar a dataframe
 library(ggfortify)
-df<-fortify(ruvest)
+df<-fortify(ruvest)%>%
+  select(Index,Data,`Point Forecast`)%>%
+  mutate(tipo=ifelse(is.na(Data),"Estimado","Observado"))%>%
+  mutate(Data=ifelse(is.na(Data),`Point Forecast`,Data))%>%
+  select(Index, Data,tipo)
+
+
+##Gráfica de ggplot
+f3<-ggplot(df, aes(x=Index, Data)) + 
+  geom_line(aes(color = tipo),size=1)+
+  geom_point(aes(color=tipo),size=2)+
+  #scale_linetype_manual(values=c("twodash","solid"))+
+  scale_color_manual(values = c("#feb24c", "#bdbdbd"))+
+  theme_minimal()+
+theme(legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#Plotly
+
+ggplotly(f3,width = 900, height = 500)%>%
+  layout(title=list(text="<b>Producción de vivienda</b><br><i>2013-2021</i><br><i>Número de viviendas</i>", 
+         x = 0,
+         font=list(family = "Century Gothic",
+        size = 16,
+        color = 'black')),
+         xaxis = list(title = ""),
+         yaxis = list(title = "Viviendas",
+                      tickformat=".1f%"),
+        dragmode="pan",
+         annotations =
+ list(x = 0, y = 0, text = "Fuente: Elaborado por CANADEVI Nacional. Gerencia de Fondos de Vivienda. Coordinación de Indicadores de Vivienda con información de RUV.", 
+      showarrow = F, xref='paper', yref='paper', 
+      xanchor='left', yanchor='auto', xshift=0, yshift=0,
+     font=list(size=8, color="black")))
+
+
+
+
+
+
+
 
 
 ##Crear highchart
 library(highcharter)
 
-highchart(type = "stock") %>% 
-  hc_size(700,500)%>%
+#highchart(type = "stock") %>% 
+ # hc_size(700,500)%>%
   ##Título
-            hc_title(text = "<b>Producción de vivienda</b>",
-                     margin = 20, align = "left",
-                     style = list(color = "black", useHTML = TRUE))%>%
+  #          hc_title(text = "<b>Producción de vivienda</b>",
+   #                  margin = 20, align = "left",
+    #                 style = list(color = "black", useHTML = TRUE))%>%
        ##Subtítulo
-            hc_subtitle(text = "<i>2013-2020</i>
-                        <br><i>Número de viviendas</i>",
-                        align = "left",
-                        style = list(color = "black", fontWeight = "bold")) %>%
-  hc_add_series(df, "line", hcaes(Index, Data), name = "Observado",
-                color='#bdbdbd') %>% 
+     #       hc_subtitle(text = "<i>2013-2020</i>
+      #                  <br><i>Número de viviendas</i>",
+       #                 align = "left",
+        #                style = list(color = "black", fontWeight = "bold")) %>%
+  #hc_add_series(df, "line", hcaes(Index, Data), name = "Observado",
+   #             color='#bdbdbd') %>% 
   #hc_add_series(df, "line", hcaes(Index, Fitted), name = "Estimado",
    #             dashStyle = "shortdash",color='#feb24c') %>%
-  hc_add_series(df, "line", hcaes(Index, `Point Forecast`), name = "Estimado",
-                color='#feb24c',dashStyle = "shortdash") %>% 
+#  hc_add_series(df, "line", hcaes(Index, `Point Forecast`), name = "Estimado",
+#                color='#feb24c',dashStyle = "shortdash") %>% 
   #hc_add_series(df, "arearange", hcaes(Index, low = `Lo 80`, high = `Hi 80`), name = "Intervalo", color="#e5f5e0")%>%
   
-    hc_tooltip(pointFormat = '{point.x: %Y-%b}
+ #   hc_tooltip(pointFormat = '{point.x: %Y-%b}
                           
 
-                            {point.y:,.0f}')%>%
-       hc_yAxis( title = list(text = "Viviendas"))%>%
-       hc_credits(
-    enabled = TRUE, text = "Fuente: Elaborado por CANADEVI Nacional. 
-    Gerencia de Fondos de Vivienda. 
-    Coordinación de Indicadores de Vivienda con información de RUV.",
-    style = list(fontSize = "8px")
-  )
+  #                          {point.y:,.0f}')%>%
+   #    hc_yAxis( title = list(text = "Viviendas"))%>%
+    #   hc_credits(
+    #enabled = TRUE, text = "Fuente: Elaborado por CANADEVI Nacional. 
+    #Gerencia de Fondos de Vivienda. 
+    #Coordinación de Indicadores de Vivienda con información de RUV.",
+    #style = list(fontSize = "8px")
+  #)
 
 
 ```
